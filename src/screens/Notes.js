@@ -18,13 +18,10 @@ import InputField from '../components/TextInput';
 import Buttons from '../config/Buttons';
 import checkNonEmpty from '../utils/checkNonEmpty';
 import {setNotesData} from '../redux/features/NoteSlice';
-import QuillEditor, {QuillToolbar} from 'react-native-cn-quill';
-import QuillNote from '../components/QuillNote';
 
 const Notes = ({navigation}) => {
   const {Notes} = useSelector(state => state.Notes);
   const dispatch = useDispatch();
-  const editor = useRef();
 
   const [deleteStatus, setDeleteStatus] = useState(false);
   const [text, setText] = useState('');
@@ -32,7 +29,6 @@ const Notes = ({navigation}) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       const anyNoteSelected = Notes.some(note => note.selected);
-      console.log(anyNoteSelected);
       setDeleteStatus(anyNoteSelected);
     });
 
@@ -57,18 +53,20 @@ const Notes = ({navigation}) => {
   };
 
   const addNote = () => {
-    const data = {text: `<h1>${text}</h1>`, selected: false};
+    const data = {text: text, selected: false};
     const textData = [...Notes, data];
     dispatch(setNotesData(textData));
     setText('');
   };
 
   const renderItem = ({item, index}) => (
-    <Pressable onPress={() => selectNote(index)} style={styles.itemContainer}>
-      <SvgXml xml={Icons.SelectIcon(item?.selected)} />
-      <Typography.LightText color={colors.black}>
-        {item?.text}
-      </Typography.LightText>
+    <Pressable onPress={() => selectNote(index)}>
+      <View style={styles.itemContainer}>
+        <SvgXml xml={Icons.SelectIcon(item?.selected)} />
+        <Typography.LightText color={colors.black}>
+          {item?.text}
+        </Typography.LightText>
+      </View>
     </Pressable>
   );
 
@@ -84,11 +82,6 @@ const Notes = ({navigation}) => {
         icon={Icons.DeleteIcon()}
         onPressIcon={deleteNote}
       />
-      {/* <QuillEditor
-        style={styles.editor}
-        ref={editor}
-        initialHtml="<h1>Quill Editor for react-native</h1>"
-      /> */}
       <ScrollView
         nestedScrollEnabled
         contentContainerStyle={styles.scrollViewContainer}
@@ -134,7 +127,6 @@ const Notes = ({navigation}) => {
           />
         </View>
       </ScrollView>
-      {/* <QuillToolbar editor={editor} options="full" theme="light" /> */}
     </>
   );
 };
@@ -142,8 +134,6 @@ const Notes = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: colors.white,
     padding: 25,
   },
